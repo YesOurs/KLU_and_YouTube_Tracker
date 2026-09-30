@@ -1,5 +1,5 @@
 # KLU & YouTube Tracker Bot
-#### Video Demo:  <[VIDEO URL]>
+#### Video Demo:  
 #### Description:
 
 This project is a fully serverless, microservice-based Telegram Bot developed as a final project for CS50. The system is designed to monitor selected YouTube channels and Kırklareli University (KLU) websites, notifying users instantly when new content or announcements are published. 
