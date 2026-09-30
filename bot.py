@@ -56,6 +56,7 @@ def handle_start(message):
     bot.send_message(chat_id, welcome_text, parse_mode='Markdown')
 
 
+# /add_youtube command
 @bot.message_handler(commands=['add_youtube'])
 def handle_add_youtube(message):
     chat_id = message.chat.id
@@ -120,6 +121,7 @@ def handle_add_youtube(message):
         connection.close()
 
 
+# /add_uni command
 @bot.message_handler(commands=['add_uni'])
 def handle_add_uni(message):
     chat_id = message.chat.id
