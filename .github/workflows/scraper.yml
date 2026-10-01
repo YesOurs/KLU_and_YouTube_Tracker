@@ -3,7 +3,7 @@ name: KLU and YouTube Scraper Automation
 # Controls when the workflow will run
 on:
   schedule:
-    - cron: '0 * * * *'  # Runs every hour at minute 0 (e.g., 12:00, 13:00)
+    - cron: '0 */3 * * *'  # Runs every 3 hours (e.g., 00:00, 03:00, 06:00 UTC)
   workflow_dispatch:     # Allows manual triggering from the GitHub Actions tab
 
 jobs:
