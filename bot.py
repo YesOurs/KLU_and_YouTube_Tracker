@@ -2,11 +2,27 @@ import os
 import telebot
 import psycopg2
 from dotenv import load_dotenv
+import threading
+from flask import Flask
 
 load_dotenv()
 token = os.getenv("TELEGRAM_BOT_TOKEN")
 db_url = os.getenv("DATABASE_URL")
 bot = telebot.TeleBot(token)
+
+# --- FAKE WEB SERVER FOR RENDER ---
+app = Flask(__name__)
+
+@app.route('/')
+def index():
+    return "Bot is awake and running!"
+
+def run_web():
+    # Get the port assigned by Render dynamically, default to 8080 if not found
+    port = int(os.environ.get("PORT", 8080))
+    app.run(host="0.0.0.0", port=port)
+# ----------------------------------
+
 
 # Router Layer: Catch incoming /start commands
 @bot.message_handler(commands=['start'])
@@ -186,5 +202,10 @@ def handle_add_uni(message):
 
 
 # Keep the bot running in continuous listening mode (Polling)
-print("System is online: Bot is listening to Telegram servers...")
-bot.infinity_polling()
+if __name__ == "__main__":
+    # 1. Start the web server in a separate thread so it doesn't block the bot
+    threading.Thread(target=run_web).start()
+    
+    # 2. Start the bot
+    print("System online: Bot is listening...")
+    bot.infinity_polling()
