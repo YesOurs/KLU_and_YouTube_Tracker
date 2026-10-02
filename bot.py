@@ -65,7 +65,9 @@ def handle_start(message):
         "_(Maks. 10 kanal izni)_\n\n"
         "🎓 *Üniversite/Fakülte Duyurusu Eklemek İçin:*\n"
         "`/add_uni <WEBSITE_LINKI>`\n"
-        "_(Maks. 2 site izni)_\n\n"
+        "_(Maks. 3 site izni)_\n\n"
+        "🗑️ *Takip Listesinden Çıkarmak İçin:*\n"
+        "`/sil <LINK>`\n\n"
         "Linkleri ekledikten sonra sistem periyodik olarak tarama yapacak ve yeni bir veri bulduğunda sana anında mesaj atacaktır."
     )
     
@@ -130,7 +132,7 @@ def handle_add_youtube(message):
         bot.send_message(chat_id, "YouTube kanalı başarıyla takip listene eklendi.")
 
     except Exception as e:
-        print("Hata:", e)
+        print("Error:", e)
         bot.send_message(chat_id, "Eklenirken bir hata oluştu.")
     finally:
         cursor.close()
@@ -194,8 +196,66 @@ def handle_add_uni(message):
         bot.send_message(chat_id, "Fakülte başarıyla takip listene eklendi.")
 
     except Exception as e:
-        print("Hata:", e)
+        print("Error:", e)
         bot.send_message(chat_id, "Eklenirken bir hata oluştu.")
+    finally:
+        cursor.close()
+        connection.close()
+
+
+# /sil command to delete an existing subscription
+@bot.message_handler(commands=['sil'])
+def handle_remove(message):
+    chat_id = message.chat.id
+    text_parts = message.text.split()
+
+    if len(text_parts) < 2:
+        bot.send_message(chat_id, "Kullanım: /sil <RSS_LINKI>")
+        return
+
+    url = text_parts[1]
+    
+    connection = psycopg2.connect(db_url)
+    cursor = connection.cursor()
+
+    try:
+        # Get User ID
+        cursor.execute("SELECT id FROM users WHERE telegram_chat_id = %s", (chat_id,))
+        user_row = cursor.fetchone()
+        if not user_row:
+            bot.send_message(chat_id, "Önce /start komutu ile sisteme kaydolmalısın.")
+            return
+        
+        user_id = user_row[0]
+
+        # Get Feed ID from the provided URL
+        cursor.execute("SELECT id FROM feeds WHERE url = %s", (url,))
+        feed_row = cursor.fetchone()
+
+        if not feed_row:
+            bot.send_message(chat_id, "Sistemde böyle bir link bulunamadı.")
+            return
+
+        feed_id = feed_row[0]
+
+        # Delete the specific subscription mapping
+        cursor.execute("""
+            DELETE FROM user_subscriptions 
+            WHERE user_id = %s AND feed_id = %s
+            RETURNING user_id;
+        """, (user_id, feed_id))
+        
+        deleted_row = cursor.fetchone()
+        
+        if deleted_row:
+            connection.commit()
+            bot.send_message(chat_id, "Link başarıyla takip listenden çıkarıldı ve limitin açıldı.")
+        else:
+            bot.send_message(chat_id, "Bu link zaten takip listende bulunmuyor.")
+
+    except Exception as e:
+        print("Error:", e)
+        bot.send_message(chat_id, "Silinirken bir hata oluştu.")
     finally:
         cursor.close()
         connection.close()
