@@ -83,7 +83,7 @@ def handle_add_youtube(message):
     text_parts = message.text.split()
     
     if len(text_parts) < 2:
-        bot.send_message(chat_id, "Kullanım: /add_youtube <RSS_LINKI>")
+        bot.send_message(chat_id, "Kullanım: /add_youtube <Kanal Linki>")
         return
 
     url = text_parts[1]
@@ -176,7 +176,7 @@ def handle_add_uni(message):
     text_parts = message.text.split()
     
     if len(text_parts) < 2:
-        bot.send_message(chat_id, "Kullanım: /add_uni <RSS_LINKI>")
+        bot.send_message(chat_id, "Kullanım: /add_uni <Üniversite Detaylı duyuru sayfası linki>")
         return
 
     url = text_parts[1]
