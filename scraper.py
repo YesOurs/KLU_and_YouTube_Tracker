@@ -43,8 +43,8 @@ def run_scraper():
 
                     all_links = soup.find_all("entry")
 
-                    # Limit to first 5 items to optimize performance
-                    for link in all_links[:5]:
+                    # Limit to first 2 items to optimize performance
+                    for link in all_links[:2]:
                         guid = link.find("id").text
                         title = link.find("title").text
                         published = link.find("published").text
