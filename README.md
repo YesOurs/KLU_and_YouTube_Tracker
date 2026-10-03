@@ -33,7 +33,7 @@ To run this project locally:
 2. Create a `.env` file in the root directory with your `TELEGRAM_BOT_TOKEN` and `DATABASE_URL`.
 3. Install dependencies: `pip install -r requirements.txt`
 4. Run the bot: `python bot.py`
-5. (Optional) Run the scraper manually: `python scraper.py`
+5. Run the scraper manually: `python scraper.py`
 
 ### Author
 YesOurs - Kırklareli/Türkiye
