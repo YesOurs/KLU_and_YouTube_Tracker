@@ -1,4 +1,6 @@
 import os
+import re
+import requests
 import telebot
 import psycopg2
 from dotenv import load_dotenv
@@ -85,6 +87,34 @@ def handle_add_youtube(message):
         return
 
     url = text_parts[1]
+
+    # Check if the URL is a standard YouTube link and not already an XML feed
+    if "youtube.com" in url or "youtu.be" in url:
+
+        if "feeds/videos.xml" not in url:
+            # Notify the user that the channel is being analyzed and converted to RSS format
+            bot.send_message(chat_id, "🔍 Kanal analiz ediliyor...")
+
+            try:
+                # Disguise as a standard web browser to fetch the page content securely
+                headers = {'User-Agent': 'Mozilla/5.0'}
+                response = requests.get(url, headers=headers, timeout=10)
+
+                # Search for the channel ID starting with "UC" inside the raw HTML using Regex
+                match = re.search(r'"channelId":"(UC[\w-]+)"', response.text)
+
+                # If a match is found, extract the ID and overwrite the url variable with the pure XML format
+                if match:
+                    channel_id = match.group(1)
+                    url = f"https://www.youtube.com/feeds/videos.xml?channel_id={channel_id}"
+
+                else:
+                    bot.send_message(chat_id, "Kanal bulunamadı.")
+                    return
+                
+            except Exception as e:
+                bot.send_message(chat_id, "Link çözümlenirken hata oluştu")
+                return
 
     # Simple connection management (Can be upgraded to connection pool for performance)
     connection = psycopg2.connect(db_url)
@@ -263,9 +293,9 @@ def handle_remove(message):
 
 # Keep the bot running in continuous listening mode (Polling)
 if __name__ == "__main__":
-    # 1. Start the web server in a separate thread so it doesn't block the bot
+    # Start the web server in a separate thread so it doesn't block the bot
     threading.Thread(target=run_web).start()
     
-    # 2. Start the bot
+    # Start the bot
     print("System online: Bot is listening...")
     bot.infinity_polling()

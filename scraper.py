@@ -2,6 +2,7 @@ import os
 import psycopg2
 import requests
 import telebot
+import lxml
 from urllib.parse import urljoin
 from bs4 import BeautifulSoup
 from dotenv import load_dotenv
@@ -37,9 +38,8 @@ def run_scraper():
                 response = requests.get(url)
 
                 if response.status_code == 200:
-                    # 'xml' parser is technically safer for RSS feeds than 'html.parser'
-                    print("Downloaded data:", response.text[:300])
-                    soup = BeautifulSoup(response.text, "html.parser")
+
+                    soup = BeautifulSoup(response.text, "xml")
 
                     all_links = soup.find_all("entry")
 
@@ -50,7 +50,7 @@ def run_scraper():
                         published = link.find("published").text
 
                         url_link = link.find("link")
-                        url = url_link.get("href")
+                        video_url = url_link.get("href")
 
                         print(f"Found: {title} - {guid}")
 
@@ -59,12 +59,12 @@ def run_scraper():
                         VALUES (%s, %s, %s, %s, %s)
                         ON CONFLICT (guid) DO NOTHING RETURNING id;
                         """
-                        cursor.execute(insert_query, (feed_id, guid, title, url, published))
+                        cursor.execute(insert_query, (feed_id, guid, title, video_url, published))
                         result = cursor.fetchone()
 
                         # If a new video is found, notify subscribers
                         if result:
-                            news.append({"title": title, "url": url})
+                            news.append({"title": title, "url": video_url})
 
                             # Find subscribers for this specific feed
                             cursor.execute("""
@@ -77,7 +77,7 @@ def run_scraper():
 
                             for sub in subscribers:
                                 try:
-                                    bot.send_message(sub[0], f"🎥 Yeni Video:\n{title}\n{url}")
+                                    bot.send_message(sub[0], f"🎥 Yeni Video:\n{title}\n{video_url}")
                                 except Exception as e:
                                     print(f"Failed to send Telegram message to {sub[0]}: {e}")
 
@@ -158,4 +158,3 @@ if __name__ == "__main__":
     print("GitHub Actions triggered the scraper. Scanning started...")
     run_scraper() 
     print("Scanning complete. Terminating script.")
-
