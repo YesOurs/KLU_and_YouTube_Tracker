@@ -100,12 +100,16 @@ def handle_add_youtube(message):
             bot.send_message(chat_id, "🔍 Kanal analiz ediliyor...")
 
             try:
-                # Disguise as a standard web browser to fetch the page content securely
-                headers = {'User-Agent': 'Mozilla/5.0'}
+                # Disguise as a modern web browser to bypass basic bot protections
+                headers = {
+                    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36',
+                    'Accept-Language': 'en-US,en;q=0.9'
+                }
                 response = requests.get(url, headers=headers, timeout=10)
 
-                # Search for the channel ID starting with "UC" inside the raw HTML using Regex
-                match = re.search(r'"channelId":"(UC[\w-]+)"', response.text)
+                # YouTube hides the channel ID in different places depending on the URL format.
+                # This robust Regex checks channelId, browseId, externalId, and meta tags all at once.
+                match = re.search(r'(?:"channelId":"|"browseId":"|"externalId":"|<meta itemprop="identifier" content=")(UC[\w-]+)', response.text)
 
                 # If a match is found, extract the ID and overwrite the url variable with the pure XML format
                 if match:
