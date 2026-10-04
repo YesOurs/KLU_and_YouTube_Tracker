@@ -1,3 +1,7 @@
+# ACKNOWLEDGEMENT:
+# During the development of this project, AI (Gemini) was used as a pair-programmer 
+# to generate boilerplate code, optimize Regex patterns, and debug SQL queries. 
+# The overall system architecture, database design, and logical flow are entirely my own.
 import os
 import psycopg2
 import requests
