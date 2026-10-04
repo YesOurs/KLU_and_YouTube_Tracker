@@ -35,5 +35,8 @@ To run this project locally:
 4. Run the bot: `python bot.py`
 5. Run the scraper manually: `python scraper.py`
 
+### Acknowledgements & AI Usage
+As permitted by the CS50 Final Project guidelines, AI tools (Gemini) were utilized to amplify productivity. The AI acted as a coding assistant for syntax generation and debugging. The core concepts, including the zero-cost deployment architecture, the URL Interceptor logic, and the idempotent database design, are my original work.
+
 ### Author
 Kaan E. - Kırklareli/Türkiye
