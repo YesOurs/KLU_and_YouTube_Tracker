@@ -36,4 +36,4 @@ To run this project locally:
 5. Run the scraper manually: `python scraper.py`
 
 ### Author
-YesOurs - Kırklareli/Türkiye
+Kaan E. - Kırklareli/Türkiye
